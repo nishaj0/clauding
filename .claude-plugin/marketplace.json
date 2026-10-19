@@ -7,7 +7,7 @@
       "name": "clauding",
       "source": "./",
       "description": "Show your Claude Code session on Discord: model, live token counts, project. Fully customizable.",
-      "version": "1.0.0"
+      "version": "1.0.1"
     }
   ]
 }

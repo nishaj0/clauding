@@ -1,6 +1,6 @@
 {
   "name": "clauding",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Discord Rich Presence for Claude Code: crab icon, model and live token counts. Customizable, zero dependencies.",
   "author": { "name": "nishaj0", "url": "https://github.com/nishaj0" },
   "repository": "https://github.com/nishaj0/clauding",

@@ -2,11 +2,7 @@
 
 Discord Rich Presence for [Claude Code](https://claude.com/claude-code). Shows the model and live token counts while a session is open.
 
-```
-Playing Clauding
-Claude Code
-Sonnet 5.5 · 129k ctx · 63k out
-```
+<img src="assets/preview.png" alt="Discord Rich Presence preview" width="420">
 
 - Appears when a session starts, disappears when it ends.
 - Everything shown is configurable (see [Configuration](#configuration)).

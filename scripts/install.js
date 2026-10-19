@@ -4,11 +4,11 @@
 //   node install.js --remove   uninstall
 const fs = require('fs'), os = require('os'), path = require('path');
 const file = path.join(os.homedir(), '.claude', 'settings.json');
-const script = path.join(__dirname, 'presence.js').replace(/\\/g, '/');
+const script = path.join(__dirname, '..', 'src', 'presence.js').replace(/\\/g, '/');
 const command = `node "${script}"`;
 const events = ['SessionStart', 'UserPromptSubmit', 'Stop', 'SessionEnd'];
 const remove = process.argv.includes('--remove');
-const mine = h => JSON.stringify(h).includes('presence.js');
+const mine = h => JSON.stringify(h).includes('src/presence.js') && !JSON.stringify(h).includes('CLAUDE_PLUGIN_ROOT');
 
 let settings = {};
 try { settings = JSON.parse(fs.readFileSync(file, 'utf8')); }

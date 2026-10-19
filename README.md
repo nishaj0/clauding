@@ -1,71 +1,111 @@
-# Clauding — Discord Rich Presence for Claude Code
+# clauding-discord-presence
 
-Show on your Discord profile that you're using [Claude Code](https://claude.com/claude-code): a crab icon, the model you're on, and live context / output token counts.
+Discord Rich Presence for [Claude Code](https://claude.com/claude-code). Shows the model and live token counts while a session is open.
 
 ```
 Playing Clauding
 Claude Code
 Sonnet 5.5 · 129k ctx · 63k out
-00:42 elapsed
 ```
 
-- Appears when a Claude Code session **starts**, disappears when it **ends**.
-- No idle/working flicker, nothing to configure.
-- Tiny: one background Node process (~55 MB, wakes every 15 s), **zero dependencies**. Talks to Discord over its local IPC pipe, no web API, no tokens, no network access.
+- Appears when a session starts, disappears when it ends.
+- Everything shown is configurable (see [Configuration](#configuration)).
+- No dependencies. Talks to Discord over its local IPC pipe.
 
-> Unofficial community project, not affiliated with or endorsed by Anthropic or Discord. The crab is original pixel art inspired by the Claude Code mascot.
+Unofficial. Not affiliated with Anthropic or Discord.
 
 ## Requirements
 
-- Node.js 18+
-- Discord **desktop** app running (the browser version has no local IPC)
-- Claude Code with hooks support
-- Tested on Windows 11. The code also has macOS/Linux pipe paths (`$XDG_RUNTIME_DIR/discord-ipc-N`) but they are untested, so reports are welcome.
+- Discord **desktop** app running
+- Node.js
+- Claude Code
+- Tested on Windows 11 only
 
-## Install
+## Installation
+
+### Plugin (recommended)
+
+```bash
+claude plugin marketplace add nishaj0/clauding-discord-presence
+claude plugin install clauding-discord-presence@clauding-discord-presence
+```
+
+Start a new Claude Code session.
+
+Update:
+
+```bash
+claude plugin marketplace update clauding-discord-presence
+claude plugin update clauding-discord-presence@clauding-discord-presence
+```
+
+Uninstall:
+
+```bash
+claude plugin uninstall clauding-discord-presence@clauding-discord-presence
+```
+
+### Manual
 
 ```bash
 git clone https://github.com/nishaj0/clauding-discord-presence.git
 cd clauding-discord-presence
-node install.js
+node scripts/install.js
 ```
 
-That adds four hooks (`SessionStart`, `UserPromptSubmit`, `Stop`, `SessionEnd`) to `~/.claude/settings.json`, pointing at `presence.js` in this folder, so don't move or delete the folder afterwards. Start a new Claude Code session and check your profile.
+This adds the hooks to `~/.claude/settings.json` pointing at this folder, so keep the folder where it is. Remove them with `node scripts/install.js --remove`. Use either the plugin or the manual install, not both.
 
-Uninstall: `node install.js --remove`
+## Configuration
+
+A config file is created at `~/.claude/clauding-presence.json` on the first session start. Edit it and save; changes apply within ~15 seconds.
+
+```json
+{
+  "details": "Claude Code",
+  "state": "{status} · {model} · {ctx} ctx · {out} out",
+  "largeText": "{project}",
+  "show": { "status": false, "model": true, "tokens": true, "project": true, "timer": true },
+  "statusText": { "working": "Working...", "idle": "Idle" },
+  "buttons": [{ "label": "Get Clauding", "url": "https://github.com/nishaj0/clauding-discord-presence" }]
+}
+```
+
+| Option | What it does |
+|---|---|
+| `details` | Top line. Any text. |
+| `state` | Second line. Any text. |
+| `largeText` | Tooltip when hovering the crab. |
+| `show.status` | Show `statusText.working` / `statusText.idle` (off by default). |
+| `show.model` | Show the model name. |
+| `show.tokens` | Show context size (`ctx`) and total output tokens (`out`). |
+| `show.project` | Make the project folder name available as `{project}`. |
+| `show.timer` | Show the elapsed-time counter. |
+| `statusText` | The words used for `{status}`. |
+| `buttons` | Up to 2 `{label, url}` links on your profile card. `[]` removes them. Other people see them, you don't. |
+
+Placeholders for the text options: `{status}` `{model}` `{ctx}` `{out}` `{project}`.
+Segments are separated by ` · `. A segment is left out when it uses a placeholder that is empty or turned off, so turning off `show.tokens` removes `129k ctx · 63k out` and nothing else. Discord needs each line to be at least 2 characters, otherwise it is omitted.
+
+Example, a custom line with the status on:
+
+```json
+{
+  "details": "Building {project}",
+  "state": "{status} · {model}",
+  "show": { "status": true, "tokens": false }
+}
+```
 
 ## How it works
 
+Claude Code hooks (`SessionStart`, `UserPromptSubmit`, `Stop`, `SessionEnd`) run `src/presence.js`, which saves the session state and starts a small background process on the first event. That process holds the Discord connection and updates your presence every 15 seconds. The model and token numbers are read from the session transcript on your machine. It exits on `SessionEnd`, when Discord closes, or after 30 minutes without activity.
+
+## Development
+
+```bash
+npm test
 ```
-Claude Code hook ──▶ presence.js (writes state.json, starts daemon if needed)
-                                   │
-                    daemon ◀───────┘   reads state every 15 s
-                       │
-                       └── Discord IPC pipe ──▶ SET_ACTIVITY
-```
-
-- The hook reads the session transcript (`transcript_path` from the hook input) to get the latest model and token usage. **ctx** = size of the last request (input + cached tokens), **out** = total output tokens this session. Nothing is read beyond that and nothing leaves your machine except what Discord itself displays.
-- `SessionEnd` makes the daemon exit. It also exits if Discord quits, or after 30 minutes without any hook event (crashed session).
-- State lives in `%TEMP%/claude-discord-presence/`.
-
-## Use your own Discord app (optional)
-
-`presence.js` ships with the Application ID of the public "Clauding" app, which is fine to use (an Application ID is public, not a secret). To brand it yourself:
-
-1. Create an app at <https://discord.com/developers/applications>. The name is what shows after "Playing". Discord rejects names containing "Claude".
-2. Upload `claude_code.png` under **Rich Presence → Art Assets** with the key `claude_code`.
-3. Set your Application ID: `export DISCORD_CLIENT_ID=123...` (or edit `CLIENT_ID` in `presence.js`).
-
-`node make-logo.js` regenerates `claude_code.png` (pure Node, no dependencies).
-
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| Nothing shows up | Discord desktop must be open. Check *Settings → Activity Privacy → Share your detected activities*. |
-| Image missing | New art assets can take a few minutes to propagate. The key must be exactly `claude_code`. |
-| Stale card after a crash | It clears itself within 30 min, or kill the `node` process whose PID is in `%TEMP%/claude-discord-presence/daemon.pid`. |
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+[MIT](LICENSE)

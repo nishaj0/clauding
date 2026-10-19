@@ -1,9 +1,9 @@
 // User-editable settings. Lives outside the repo so plugin updates never overwrite it.
 const fs = require('fs'), os = require('os'), path = require('path');
 
-const CONFIG_FILE = path.join(os.homedir(), '.claude', 'clauding-presence.json');
+const CONFIG_FILE = path.join(os.homedir(), '.claude', 'clauding.json');
 const CLIENT_ID = '1561708884283105392';
-const REPO_URL = 'https://github.com/nishaj0/clauding-discord-presence';
+const REPO_URL = 'https://github.com/nishaj0/clauding';
 
 const DEFAULTS = {
   // Text lines. Placeholders: {status} {model} {ctx} {out} {project}.

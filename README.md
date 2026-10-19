@@ -1,4 +1,4 @@
-# clauding-discord-presence
+# clauding
 
 Discord Rich Presence for [Claude Code](https://claude.com/claude-code). Shows the model and live token counts while a session is open.
 
@@ -22,8 +22,8 @@ Unofficial. Not affiliated with Anthropic or Discord.
 ### Plugin (recommended)
 
 ```bash
-claude plugin marketplace add nishaj0/clauding-discord-presence
-claude plugin install clauding-discord-presence@clauding-discord-presence
+claude plugin marketplace add nishaj0/clauding
+claude plugin install clauding@clauding
 ```
 
 Start a new Claude Code session.
@@ -31,21 +31,21 @@ Start a new Claude Code session.
 Update:
 
 ```bash
-claude plugin marketplace update clauding-discord-presence
-claude plugin update clauding-discord-presence@clauding-discord-presence
+claude plugin marketplace update clauding
+claude plugin update clauding@clauding
 ```
 
 Uninstall:
 
 ```bash
-claude plugin uninstall clauding-discord-presence@clauding-discord-presence
+claude plugin uninstall clauding@clauding
 ```
 
 ### Manual
 
 ```bash
-git clone https://github.com/nishaj0/clauding-discord-presence.git
-cd clauding-discord-presence
+git clone https://github.com/nishaj0/clauding.git
+cd clauding
 node scripts/install.js
 ```
 
@@ -53,7 +53,7 @@ This adds the hooks to `~/.claude/settings.json` pointing at this folder, so kee
 
 ## Configuration
 
-A config file is created at `~/.claude/clauding-presence.json` on the first session start. Edit it and save; changes apply within ~15 seconds.
+A config file is created at `~/.claude/clauding.json` on the first session start. Edit it and save; changes apply within ~15 seconds.
 
 ```json
 {
@@ -62,7 +62,7 @@ A config file is created at `~/.claude/clauding-presence.json` on the first sess
   "largeText": "{project}",
   "show": { "status": false, "model": true, "tokens": true, "project": true, "timer": true },
   "statusText": { "working": "Working...", "idle": "Idle" },
-  "buttons": [{ "label": "Get Clauding", "url": "https://github.com/nishaj0/clauding-discord-presence" }]
+  "buttons": [{ "label": "Get Clauding", "url": "https://github.com/nishaj0/clauding" }]
 }
 ```
 

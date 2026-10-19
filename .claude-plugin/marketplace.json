@@ -1,10 +1,10 @@
 {
-  "name": "clauding-discord-presence",
+  "name": "clauding",
   "owner": { "name": "nishaj0" },
   "metadata": { "description": "Discord Rich Presence for Claude Code" },
   "plugins": [
     {
-      "name": "clauding-discord-presence",
+      "name": "clauding",
       "source": "./",
       "description": "Show your Claude Code session on Discord: model, live token counts, project. Fully customizable.",
       "version": "1.0.0"

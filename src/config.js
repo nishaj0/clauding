@@ -11,7 +11,9 @@ const DEFAULTS = {
   details: 'Claude Code',
   state: '{status} · {model} · {ctx} ctx · {out} out',
   largeText: '{project}', // tooltip on the crab
+  appDetails: 'Claude',   // top line while the desktop app is open but no Claude Code session is active (chat)
   show: {
+    app: true,     // show the presence whenever the Claude desktop app is open, not only during Code sessions
     status: false, // working / idle indicator
     model: true,
     tokens: true,  // context size + total output tokens
@@ -19,6 +21,8 @@ const DEFAULTS = {
     timer: true,   // "elapsed" counter
   },
   statusText: { working: 'Working...', idle: 'Idle' },
+  // Windows only: start at login so the presence also works when you only chat in the desktop app.
+  autostart: false,
   // Up to 2 buttons shown to OTHER people on your profile (Discord hides them from you). [] to disable.
   buttons: [{ label: 'Get Clauding', url: REPO_URL }],
 };

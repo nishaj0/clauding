@@ -1,4 +1,4 @@
-// State + config -> Discord activity payload. Pure, so it is unit-tested.
+// Sessions + config -> Discord activity payload. Pure, so it is unit-tested.
 const k = n => (n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'k' : String(n));
 
 // claude-sonnet-5-5 -> "Sonnet 5.5"
@@ -18,22 +18,33 @@ function fill(template, vars) {
   }).filter(s => s !== null).join(' · ');
 }
 
-function buildActivity(state, cfg) {
-  const { show } = cfg, hasUsage = show.tokens && state.ctx != null;
-  const vars = {
-    status: show.status ? (state.busy ? cfg.statusText.working : cfg.statusText.idle) : '',
-    model: show.model && state.model ? prettyModel(state.model) : '',
-    ctx: hasUsage ? k(state.ctx) : '',
-    out: hasUsage && state.out != null ? k(state.out) : '',
-    project: show.project ? state.project : '',
-  };
+// What to show right now: the most recently active Claude Code session, else just "the app is open", else nothing.
+function pickView(sessions, appSince, showApp) {
+  if (sessions.length) {
+    const latest = sessions.reduce((a, b) => (b.at > a.at ? b : a));
+    return { ...latest, busy: sessions.some(s => s.busy), since: Math.min(...sessions.map(s => s.since)), hasSession: true };
+  }
+  return appSince && showApp ? { since: appSince, hasSession: false } : null;
+}
+
+function buildActivity(view, cfg) {
+  const { show } = cfg, hasUsage = view.hasSession && show.tokens && view.ctx != null;
+  const vars = view.hasSession ? {
+    status: show.status ? (view.busy ? cfg.statusText.working : cfg.statusText.idle) : '',
+    model: show.model && view.model ? prettyModel(view.model) : '',
+    ctx: hasUsage ? k(view.ctx) : '',
+    out: hasUsage && view.out != null ? k(view.out) : '',
+    project: show.project ? view.project : '',
+  } : {};
   const text = tpl => fill(tpl, vars).slice(0, 128); // Discord: 2..128 chars
+  const details = text(view.hasSession ? cfg.details : cfg.appDetails);
+  const line = view.hasSession ? text(cfg.state) : '';
+  const tip = text(cfg.largeText);
   const activity = {};
-  const details = text(cfg.details), line = text(cfg.state), tip = text(cfg.largeText);
   if (details.length >= 2) { activity.details = details; activity.status_display_type = 2; } // show details as the status line
   if (line.length >= 2) activity.state = line;
   activity.assets = { large_image: 'claude_code', ...(tip.length >= 2 && { large_text: tip }) };
-  if (show.timer) activity.timestamps = { start: Math.floor(state.since / 1000) };
+  if (show.timer) activity.timestamps = { start: Math.floor(view.since / 1000) };
   const buttons = (Array.isArray(cfg.buttons) ? cfg.buttons : [])
     .filter(b => b && b.label && /^https?:\/\//.test(b.url)).slice(0, 2)
     .map(b => ({ label: String(b.label).slice(0, 32), url: b.url }));
@@ -41,4 +52,4 @@ function buildActivity(state, cfg) {
   return activity;
 }
 
-module.exports = { buildActivity, prettyModel, fill };
+module.exports = { buildActivity, pickView, prettyModel, fill };

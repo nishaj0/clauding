@@ -23,9 +23,16 @@ const DEFAULTS = {
   buttons: [{ label: 'Get Clauding', url: REPO_URL }],
 };
 
+let lastGood = {};
+
 function loadConfig() {
-  let user = {};
-  try { user = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')); } catch {} // missing/invalid -> defaults
+  try {
+    const parsed = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+    if (parsed && typeof parsed === 'object') lastGood = parsed;
+  } catch (e) {
+    if (e.code === 'ENOENT') lastGood = {}; // deleted -> defaults; a typo keeps the last valid config
+  }
+  const user = lastGood;
   return {
     ...DEFAULTS, ...user,
     show: { ...DEFAULTS.show, ...user.show },

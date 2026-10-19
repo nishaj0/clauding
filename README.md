@@ -53,7 +53,7 @@ This adds the hooks to `~/.claude/settings.json` pointing at this folder, so kee
 
 ## Configuration
 
-A config file is created at `~/.claude/clauding.json` on the first session start. Edit it and save; changes apply within ~15 seconds.
+A config file is created at `~/.claude/clauding.json` on the first session start. Edit it and save; changes apply within ~15 seconds. If the file has a syntax error, the last valid config stays in use. Deleting the file restores the defaults.
 
 ```json
 {

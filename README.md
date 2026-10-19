@@ -22,11 +22,11 @@ Unofficial. Not affiliated with Anthropic or Discord.
 
 | Platform | Status | Tested with | Code session presence | Desktop app / chat presence | `autostart` |
 |---|---|---|---|---|---|
-| Windows 11 (64-bit) | Tested | Node.js 24.12, Claude Code 2.1.299, Discord stable 1.0.9262 | Yes | Yes | Yes |
-| macOS | Not tested | | Should work (untested) | Not implemented | Not implemented |
-| Linux | Not tested | | Should work (untested) | Not implemented | Not implemented |
+| Windows 11 (64-bit) | Working | Node.js 24.12, Claude Code 2.1.299, Discord stable 1.0.9262 | Yes | Yes | Yes |
+| macOS | Untested | | Should work (untested) | Not implemented | Not implemented |
+| Linux | Untested | | Should work (untested) | Not implemented | Not implemented |
 
-Hooks, the Discord connection and the config are not Windows specific, which is why session presence should work elsewhere, but nothing outside Windows has been run. Detecting the desktop app and `autostart` currently only exist for Windows. If you try it on another platform or version, please open an issue with the result so this table can be updated.
+Hooks, the Discord connection and the config are not Windows specific, which is why session presence should work elsewhere, but it has only been run on Windows. Detecting the desktop app and `autostart` currently only exist for Windows. If you try it on another platform or version, please open an issue with the result so this table can be updated.
 
 ## Installation
 
